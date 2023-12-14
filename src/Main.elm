@@ -36,28 +36,6 @@ type alias Stats =
     }
 
 
-type Ability
-    = Attack
-    | Heal
-    | Fireball
-    | Icebolt
-    | Lightning
-    | PoisonDart
-    | Backstab
-    | ShieldBash
-    | Regenerate
-    | HolyShield
-    | Invisibility
-
-
-type alias AbilityRecord =
-    { name : String
-    , description : String
-    , energyCost : Int
-    , timeCost : Int
-    }
-
-
 type Effect
     = Regeneration
     | Shield
