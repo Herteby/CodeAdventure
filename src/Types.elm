@@ -13,12 +13,13 @@ type alias Character =
     { id : Int
     , name : String
     , class : Class
+    , race : Race
     , level : Int
     , abilities : List Ability
     , rightHand : Item
     , leftHand : Item
     , body : Item
-    , armor : Armor
+    , defense : Defense
     , maxHealth : Int
     , maxMana : Int
     , maxStamina : Int
@@ -43,6 +44,16 @@ type Class
     | Cleric
 
 
+type Race
+    = Humanoid
+    | Undead
+    | Demon
+    | Beast
+    | Dragon
+    | Elemental
+    | Construct
+
+
 type alias Item =
     { name : String
     , quality : Quality
@@ -62,7 +73,7 @@ type Quality
 
 type ItemKind
     = Weapon Int Hands ( DamageType, Int )
-    | Armor Armor
+    | Armor Defense
     | Shield
 
 
@@ -100,7 +111,7 @@ type alias Ability =
     , cost : Cost
     , time : Int
     , damage : Maybe ( DamageType, Int )
-    , effects : List ( Effect, Int )
+    , effects : List Effect
     }
 
 
@@ -117,7 +128,7 @@ type Cost
     | Stamina Int
 
 
-type alias Armor =
+type alias Defense =
     { fire : Int
     , ice : Int
     , lightning : Int

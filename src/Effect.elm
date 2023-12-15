@@ -38,10 +38,37 @@ shield chance duration =
     }
 
 
-armor : Int -> Duration -> Effect
-armor amount duration =
-    { name = "Armor"
+defenseAll : Int -> Duration -> Effect
+defenseAll amount duration =
+    { name = "Defense"
     , kind = Buff
-    , description = "+" ++ String.fromInt amount ++ " armor against all damage"
+    , description = "+" ++ String.fromInt amount ++ " defense against all damage"
+    , duration = duration
+    }
+
+
+defensePhysical : Int -> Duration -> Effect
+defensePhysical amount duration =
+    { name = "Defense"
+    , kind = Buff
+    , description = "+" ++ String.fromInt amount ++ " defense against physical damage"
+    , duration = duration
+    }
+
+
+defenseMagical : Int -> Duration -> Effect
+defenseMagical amount duration =
+    { name = "Defense"
+    , kind = Buff
+    , description = "+" ++ String.fromInt amount ++ " defense against magical damage"
+    , duration = duration
+    }
+
+
+stunned : Duration -> Effect
+stunned duration =
+    { name = "Stunned"
+    , kind = Debuff
+    , description = "Unable to act"
     , duration = duration
     }

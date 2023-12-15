@@ -10,8 +10,7 @@ import Types exposing (..)
 
 initialModel : Model
 initialModel =
-    { party =
-        []
+    { party = []
     , enemies = []
     }
 
@@ -83,7 +82,7 @@ actionBar : Character -> Html Msg
 actionBar character =
     case character.state of
         Ready ->
-            bar (rgb 20 200 20) (Just "Ready") 1 1
+            bar (rgb 255 200 20) (Just "Ready") 1 1
 
         Preparing ability i ->
             bar (rgb 255 200 20) (Just ability.name) i ability.time

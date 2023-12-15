@@ -18,7 +18,7 @@ type alias WeaponTemplate =
 
 type alias ArmorTemplate =
     { name : String
-    , armor : Armor
+    , defense : Defense
     , classes : List Class
     , material : Material
     }
@@ -83,7 +83,7 @@ view item =
                     text "Shield"
 
                 Armor armor ->
-                    viewArmor armor
+                    viewDefense armor
             , div [] [ text (String.fromInt item.value) ]
             , div [] (List.map Effect.view item.effects)
             , div [] (item.classes |> List.map className |> List.map text)
@@ -91,8 +91,8 @@ view item =
         ]
 
 
-viewArmor : Armor -> Html msg
-viewArmor armor =
+viewDefense : Defense -> Html msg
+viewDefense armor =
     div []
         [ div [] [ text "Piercing: ", text (String.fromInt armor.piercing) ]
         , div [] [ text "Slashing: ", text (String.fromInt armor.slashing) ]
@@ -188,7 +188,7 @@ shield q =
     , quality = q
     , value = modValue q 100
     , kind = Shield
-    , effects = [ Effect.shield 33 Permanent, Effect.armor a Permanent ]
+    , effects = [ Effect.shield 33 Permanent, Effect.defenseAll a Permanent ]
     , classes = [ Warrior, Cleric ]
     }
 
@@ -319,14 +319,26 @@ craftArmor template q =
     { name = prefix template.material q template.name
     , quality = q
     , value = modValue q 100
-    , kind = Armor template.armor
+    , kind = Armor (modDefense (mod q) template.defense)
     , effects = []
     , classes = template.classes
     }
 
 
-baseArmor : Int -> Armor
-baseArmor v =
+modDefense : Float -> Defense -> Defense
+modDefense m d =
+    { fire = round (toFloat d.fire * m)
+    , ice = round (toFloat d.ice * m)
+    , lightning = round (toFloat d.lightning * m)
+    , poison = round (toFloat d.poison * m)
+    , piercing = round (toFloat d.piercing * m)
+    , slashing = round (toFloat d.slashing * m)
+    , blunt = round (toFloat d.blunt * m)
+    }
+
+
+baseDefense : Int -> Defense
+baseDefense v =
     { fire = v
     , ice = v
     , lightning = v
@@ -340,7 +352,7 @@ baseArmor v =
 robe : ArmorTemplate
 robe =
     { name = "Robe"
-    , armor = baseArmor 0
+    , defense = baseDefense 0
     , classes = [ Wizard ]
     , material = Magic
     }
@@ -349,7 +361,7 @@ robe =
 leatherArmor : ArmorTemplate
 leatherArmor =
     { name = "Armor"
-    , armor = baseArmor 2 |> (\a -> { a | slashing = 6, blunt = 2 })
+    , defense = baseDefense 2 |> (\a -> { a | slashing = 6, blunt = 2 })
     , classes = [ Warrior, Rogue, Cleric ]
     , material = Leather
     }
@@ -358,7 +370,7 @@ leatherArmor =
 chainMail : ArmorTemplate
 chainMail =
     { name = "Chain Mail"
-    , armor = baseArmor 5 |> (\a -> { a | piercing = 7, slashing = 9, blunt = 3, lightning = 2 })
+    , defense = baseDefense 5 |> (\a -> { a | piercing = 7, slashing = 9, blunt = 3, lightning = 2 })
     , classes = [ Warrior, Cleric ]
     , material = ChainMail
     }
@@ -367,7 +379,7 @@ chainMail =
 plateArmor : ArmorTemplate
 plateArmor =
     { name = "Plate Armor"
-    , armor = baseArmor 10 |> (\a -> { a | piercing = 7, slashing = 11, blunt = 8, lightning = 2 })
+    , defense = baseDefense 10 |> (\a -> { a | piercing = 7, slashing = 11, blunt = 8, lightning = 2 })
     , classes = [ Warrior, Rogue ]
     , material = Metal
     }
