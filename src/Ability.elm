@@ -1,62 +1,34 @@
 module Ability exposing (..)
 
 import Html.Styled exposing (..)
+import Types exposing (Ability, DamageType(..))
 
 
-type alias Ability =
-    { name : String
-    , description : String
-    , target : Target
-    , energyCost : Int
-    , speed : Int
-    }
-
-
-type Damage
-    = Fire
-    | Ice
-    | Lightning
-    | Piercing
-    | Slashing
-    | Bludgeoning
-
-
-type Target
-    = Self
-    | Enemy Stat
-    | Ally
-    | AllAllies
-    | AllEnemies Stat
-
-
-type Stat
-    = Strength
-    | Dexterity
-    | Constitution
-    | Intelligence
-    | Willpower
-
-
-type Abilityz
-    = Attack
-    | Heal
-    | Fireball
-    | Icebolt
-    | LightningStorm
-    | Backstab
-    | ShieldBash
-    | Regenerate
-    | HolyShield
-    | Invisibility
+abilities : List Ability
+abilities =
+    [ attack
+    , heal
+    , fireball
+    , icebolt
+    , lightningStorm
+    , shieldBash
+    , holyShield
+    , invisibility
+    , engage
+    , backstab
+    , legSweep
+    , warCry
+    ]
 
 
 attack : Ability
 attack =
     { name = "Attack"
     , description = "Basic weapon attack"
-    , target = Enemy Dexterity
     , energyCost = 0
-    , speed = 1
+    , time = 1
+    , damage = Nothing
+    , effects = []
     }
 
 
@@ -64,9 +36,10 @@ heal : Ability
 heal =
     { name = "Heal"
     , description = "Heal an ally"
-    , target = Ally
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Nothing
+    , effects = []
     }
 
 
@@ -74,9 +47,10 @@ fireball : Ability
 fireball =
     { name = "Fireball"
     , description = "A ball of fire"
-    , target = Enemy Dexterity
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Just { damageType = Fire, max = 10, min = 5 }
+    , effects = []
     }
 
 
@@ -84,9 +58,10 @@ icebolt : Ability
 icebolt =
     { name = "Icebolt"
     , description = "A bolt of ice"
-    , target = Enemy Dexterity
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Just { damageType = Ice, max = 10, min = 5 }
+    , effects = []
     }
 
 
@@ -94,9 +69,10 @@ lightningStorm : Ability
 lightningStorm =
     { name = "Lightning Storm"
     , description = "A storm of lightning"
-    , target = AllEnemies Dexterity
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Just { damageType = Lightning, max = 10, min = 5 }
+    , effects = []
     }
 
 
@@ -104,9 +80,10 @@ shieldBash : Ability
 shieldBash =
     { name = "Shield Bash"
     , description = "Bash an enemy with your shield"
-    , target = Enemy Dexterity
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Just { damageType = Blunt, max = 10, min = 5 }
+    , effects = []
     }
 
 
@@ -114,9 +91,10 @@ holyShield : Ability
 holyShield =
     { name = "Holy Shield"
     , description = "A shield of holy light"
-    , target = Ally
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Nothing
+    , effects = []
     }
 
 
@@ -124,9 +102,54 @@ invisibility : Ability
 invisibility =
     { name = "Invisibility"
     , description = "Become invisible"
-    , target = Self
     , energyCost = 5
-    , speed = 1
+    , time = 1
+    , damage = Nothing
+    , effects = []
+    }
+
+
+engage : Ability
+engage =
+    { name = "Engage"
+    , description = "Engage an enemy"
+    , energyCost = 5
+    , time = 1
+    , damage = Nothing
+    , effects = []
+    }
+
+
+backstab : Ability
+backstab =
+    { name = "Backstab"
+    , description = "Stab an enemy in the back"
+    , energyCost = 5
+    , time = 1
+    , damage = Just { damageType = Piercing, max = 10, min = 5 }
+    , effects = []
+    }
+
+
+legSweep : Ability
+legSweep =
+    { name = "Leg Sweep"
+    , description = "Sweep an enemy's legs"
+    , energyCost = 5
+    , time = 1
+    , damage = Just { damageType = Blunt, max = 10, min = 5 }
+    , effects = []
+    }
+
+
+warCry : Ability
+warCry =
+    { name = "War Cry"
+    , description = "A cry of war"
+    , energyCost = 5
+    , time = 1
+    , damage = Nothing
+    , effects = []
     }
 
 
@@ -134,23 +157,6 @@ info : Ability -> Html msg
 info ability =
     div []
         [ div [] [ text ability.name ]
-        , div []
-            [ text <|
-                case ability.target of
-                    Self ->
-                        "Self"
-
-                    Enemy ->
-                        "Enemy"
-
-                    Ally ->
-                        "Ally"
-
-                    AllAllies ->
-                        "All Allies"
-
-                    AllEnemies ->
-                        "All Enemies"
-            ]
+        , div [] []
         , div [] [ text ability.description ]
         ]

@@ -5,82 +5,15 @@ import Css exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
 import Time
-
-
-type alias Model =
-    { party : List Character
-    , enemies : List Character
-    }
-
-
-type alias Character =
-    { name : String
-    , stats : Stats
-    , health : Int
-    , maxHealth : Int
-    , armor : Int
-    , maxEnergy : Int
-    , energy : Int
-    , energyRegen : Int
-    , effects : List Effect
-    , casting : Maybe ( Ability, Int )
-    }
-
-
-type alias Stats =
-    { strength : Int
-    , dexterity : Int
-    , constitution : Int
-    , intelligence : Int
-    , willpower : Int
-    }
-
-
-type Effect
-    = Regeneration
-    | Shield
-    | Burn
-    | Freeze
-    | Bleed
-    | Poison
-    | Stun
-
-
-type alias EffectRecord =
-    { name : String
-    , description : String
-    }
+import Types exposing (..)
 
 
 initialModel : Model
 initialModel =
     { party =
-        [ initCharacter "Fighter"
-        , initCharacter "Wizard"
-        , initCharacter "Cleric"
-        , initCharacter "Rogue"
-        ]
+        []
     , enemies = []
     }
-
-
-initCharacter : String -> Character
-initCharacter name =
-    { name = name
-    , stats = { strength = 10, dexterity = 10, constitution = 10, intelligence = 10, willpower = 10, luck = 10 }
-    , health = 100
-    , maxHealth = 100
-    , armor = 10
-    , maxEnergy = 100
-    , energy = 100
-    , energyRegen = 5
-    , effects = []
-    , casting = Nothing
-    }
-
-
-type Msg
-    = Tick Time.Posix
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -90,64 +23,90 @@ update msg model =
             ( model, Cmd.none )
 
 
-bar : Color -> Int -> Int -> Html Msg
-bar barColor value max =
-    div
-        [ css
-            [ width (px 100)
-            , height (px 20)
-            , position relative
-            , backgroundColor (rgb 0 0 0)
-            , borderRadius (px 5)
-            , overflow hidden
-            ]
-        ]
-        [ div
-            [ css
-                [ width (px (toFloat (100 * value // max)))
-                , height (px 20)
-                , backgroundColor barColor
-                ]
-            ]
-            []
-        , div
+bar : Color -> Maybe String -> Int -> Int -> Html Msg
+bar barColor txt value max =
+    if max == 0 then
+        text ""
+
+    else
+        div
             [ css
                 [ width (px 100)
                 , height (px 20)
-                , position absolute
-                , textAlign center
-                , lineHeight (px 20)
-                , top (px 0)
+                , position relative
+                , backgroundColor (rgb 0 0 0)
+                , borderRadius (px 5)
+                , overflow hidden
+                , margin (px 5)
                 ]
             ]
-            [ text (String.fromInt value ++ "/" ++ String.fromInt max)
+            [ div
+                [ css
+                    [ width (px (toFloat (100 * value // max)))
+                    , height (px 20)
+                    , backgroundColor barColor
+                    ]
+                ]
+                []
+            , div
+                [ css
+                    [ width (px 100)
+                    , height (px 20)
+                    , position absolute
+                    , textAlign center
+                    , lineHeight (px 20)
+                    , top (px 0)
+                    , backgroundImage (linearGradient (stop (rgba 0 0 0 0)) (stop (rgba 0 0 0 0.5)) [])
+                    ]
+                ]
+                [ text (txt |> Maybe.withDefault (String.fromInt value ++ "/" ++ String.fromInt max))
+                ]
             ]
-        ]
 
 
 healthBar : Character -> Html Msg
 healthBar character =
-    bar (rgb 200 20 20) character.health character.maxHealth
+    bar (rgb 200 20 20) Nothing character.health character.maxHealth
 
 
-energyBar : Character -> Html Msg
-energyBar character =
-    bar (rgb 20 50 200) character.energy character.maxEnergy
+manaBar : Character -> Html Msg
+manaBar character =
+    bar (rgb 20 50 200) Nothing character.mana character.maxMana
 
 
-castingBar : Character -> Html Msg
-castingBar character =
-    bar (rgb 255 200 20) character.energy character.maxEnergy
+staminaBar : Character -> Html Msg
+staminaBar character =
+    bar (rgb 20 200 20) Nothing character.stamina character.maxStamina
+
+
+actionBar : Character -> Html Msg
+actionBar character =
+    case character.state of
+        Ready ->
+            bar (rgb 20 200 20) (Just "Ready") 1 1
+
+        Preparing ability i ->
+            bar (rgb 255 200 20) (Just ability.name) i ability.time
+
+        Cooldown ability i ->
+            bar (rgb 100 100 100) (Just ability.name) (ability.time - i) ability.time
 
 
 characterView : Character -> Html Msg
 characterView character =
     div
-        []
-        [ text character.name
+        [ css
+            [ backgroundColor (rgb 90 90 90)
+            , padding (px 5)
+            , margin (px 5)
+            , borderRadius (px 10)
+            ]
+        ]
+        [ div [ css [ margin (px 5) ] ] [ text character.name ]
         , healthBar character
-        , energyBar character
-        , castingBar character
+        , manaBar character
+        , staminaBar character
+        , actionBar character
         ]
 
 
@@ -158,6 +117,7 @@ view model =
             [ displayFlex
             , color (rgb 255 255 255)
             , textShadow4 (px 1) (px 1) (px 1) (rgb 0 0 0)
+            , lineHeight (Css.em 1)
             ]
         ]
         [ div
