@@ -1,11 +1,22 @@
 module Main exposing (main)
 
 import Browser
+import Character exposing (Character)
 import Css exposing (..)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes exposing (css)
+import Misc exposing (..)
 import Time
-import Types exposing (..)
+
+
+type alias Model =
+    { party : List Character
+    , enemies : List Character
+    }
+
+
+type Msg
+    = Tick Time.Posix
 
 
 initialModel : Model
@@ -25,7 +36,7 @@ update msg model =
 bar : Color -> Maybe String -> Int -> Int -> Html Msg
 bar barColor txt value max =
     if max == 0 then
-        text ""
+        void
 
     else
         div
@@ -36,7 +47,6 @@ bar barColor txt value max =
                 , backgroundColor (rgb 0 0 0)
                 , borderRadius (px 5)
                 , overflow hidden
-                , margin (px 5)
                 ]
             ]
             [ div
@@ -80,7 +90,7 @@ staminaBar character =
 
 actionBar : Character -> Html Msg
 actionBar character =
-    case character.state of
+    case character.action of
         Ready ->
             bar (rgb 255 200 20) (Just "Ready") 1 1
 

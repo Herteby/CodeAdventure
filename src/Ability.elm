@@ -1,43 +1,152 @@
 module Ability exposing (..)
 
-import Effect
+import Css exposing (..)
+import DamageType exposing (DamageType(..))
+import Effect exposing (Effect(..))
 import Html.Styled exposing (..)
-import Types exposing (..)
+import Html.Styled.Attributes exposing (css)
+import Misc exposing (void)
 
 
-abilities : List Ability
-abilities =
-    [ attack
-    , heal
-    , fireball
-    , icebolt
-    , lightningStorm
-    , shieldBash
-    , holyShield
-    , invisibility
-    , engage
-    , backstab
-    , legSweep
-    , warCry
-    ]
+type alias Ability =
+    { name : String
+    , description : Maybe String
+    , target : Target
+    , cost : Cost
+    , time : Int
+    , damage : Maybe ( DamageType, Int )
+    , effects : List ( Effect, Int )
+    }
 
 
-attack : Ability
-attack =
-    { name = "Attack"
-    , description = "Basic weapon attack"
+type Target
+    = Self
+    | Ally
+    | Enemy
+    | AllAllies
+    | AllEnemies
+
+
+type Cost
+    = Mana Int
+    | Stamina Int
+
+
+view : Ability -> Html msg
+view ability =
+    div []
+        [ div [] [ text ability.name ]
+        , case ability.description of
+            Nothing ->
+                void
+
+            Just description ->
+                div [] [ text description ]
+        , case ability.damage of
+            Nothing ->
+                void
+
+            Just ( damageType, damage ) ->
+                div [] [ text (String.fromInt damage), text " ", DamageType.view damageType ]
+        ]
+
+
+attack : String -> Cost -> Int -> DamageType -> Int -> Ability
+attack name cost time damageType damage =
+    { name = "Attack: " ++ name
+    , description = Nothing
     , target = Enemy
-    , cost = Stamina 10
-    , time = 1
-    , damage = Nothing
+    , cost = cost
+    , time = time
+    , damage = Just ( damageType, damage )
     , effects = []
     }
+
+
+dagger : Ability
+dagger =
+    attack "Dagger" (Stamina 5) 15 (BestOf Piercing Slashing) 7
+
+
+longSword : Ability
+longSword =
+    attack "Long Sword" (Stamina 10) 30 (BestOf Piercing Slashing) 10
+
+
+mace : Ability
+mace =
+    attack "Mace" (Stamina 10) 30 Blunt 12
+
+
+axe : Ability
+axe =
+    attack "Axe" (Stamina 10) 30 Slashing 12
+
+
+greatsword : Ability
+greatsword =
+    attack "Greatsword" (Stamina 15) 50 (BestOf Piercing Slashing) 20
+
+
+spear : Ability
+spear =
+    attack "Spear" (Stamina 15) 50 Piercing 24
+
+
+maul : Ability
+maul =
+    attack "Maul" (Stamina 15) 50 Blunt 24
+
+
+halberd : Ability
+halberd =
+    attack "Halberd" (Stamina 15) 50 (BestOf Piercing Blunt) 20
+
+
+bow : Ability
+bow =
+    attack "Bow" (Stamina 15) 30 Piercing 14
+
+
+crossbow : Ability
+crossbow =
+    attack "Crossbow" (Stamina 15) 50 Piercing 20
+
+
+musket : Ability
+musket =
+    attack "Musket" (Stamina 15) 100 Piercing 35
+
+
+fireStaff : Ability
+fireStaff =
+    attack "Fire Staff" (Stamina 30) 30 Fire 12
+
+
+iceStaff : Ability
+iceStaff =
+    attack "Ice Staff" (Stamina 30) 30 Ice 12
+
+
+lightningStaff : Ability
+lightningStaff =
+    attack "Lightning Staff" (Stamina 30) 30 Lightning 12
+
+
+claws : Ability
+claws =
+    attack "Claws" (Stamina 15) 15 Slashing 7
+
+
+bite : Ability
+bite =
+    attack "Bite" (Stamina 15) 30 Piercing 12
 
 
 heal : Ability
 heal =
     { name = "Heal"
-    , description = "Heal an ally"
+    , description = Nothing
     , target = Ally
     , cost = Mana 10
     , time = 1
@@ -49,7 +158,7 @@ heal =
 fireball : Ability
 fireball =
     { name = "Fireball"
-    , description = "A ball of fire"
+    , description = Nothing
     , target = Enemy
     , cost = Mana 10
     , time = 1
@@ -61,7 +170,7 @@ fireball =
 icebolt : Ability
 icebolt =
     { name = "Icebolt"
-    , description = "A bolt of ice"
+    , description = Nothing
     , target = Enemy
     , cost = Mana 10
     , time = 1
@@ -73,7 +182,7 @@ icebolt =
 lightningStorm : Ability
 lightningStorm =
     { name = "Lightning Storm"
-    , description = "A storm of lightning"
+    , description = Nothing
     , target = AllEnemies
     , cost = Mana 10
     , time = 1
@@ -85,19 +194,19 @@ lightningStorm =
 shieldBash : Ability
 shieldBash =
     { name = "Shield Bash"
-    , description = "Bash an enemy with your shield"
+    , description = Nothing
     , target = Enemy
     , cost = Stamina 10
     , time = 1
     , damage = Just ( Blunt, 10 )
-    , effects = [ Effect.stunned (Seconds 20) ]
+    , effects = [ ( Stunned, 20 ) ]
     }
 
 
 holyShield : Ability
 holyShield =
     { name = "Holy Shield"
-    , description = "A shield of holy light"
+    , description = Nothing
     , target = Ally
     , cost = Mana 10
     , time = 1
@@ -109,7 +218,7 @@ holyShield =
 invisibility : Ability
 invisibility =
     { name = "Invisibility"
-    , description = "Become invisible"
+    , description = Nothing
     , target = Self
     , cost = Mana 10
     , time = 1
@@ -121,7 +230,7 @@ invisibility =
 engage : Ability
 engage =
     { name = "Engage"
-    , description = "Engage an enemy"
+    , description = Nothing
     , target = Enemy
     , cost = Stamina 10
     , time = 1
@@ -133,7 +242,7 @@ engage =
 backstab : Ability
 backstab =
     { name = "Backstab"
-    , description = "Stab an enemy in the back"
+    , description = Nothing
     , target = Enemy
     , cost = Stamina 10
     , time = 1
@@ -145,7 +254,7 @@ backstab =
 legSweep : Ability
 legSweep =
     { name = "Leg Sweep"
-    , description = "Sweep an enemy's legs"
+    , description = Nothing
     , target = Enemy
     , cost = Stamina 10
     , time = 1
@@ -157,19 +266,10 @@ legSweep =
 warCry : Ability
 warCry =
     { name = "War Cry"
-    , description = "A cry of war"
+    , description = Nothing
     , target = AllEnemies
     , cost = Stamina 10
     , time = 1
     , damage = Nothing
     , effects = []
     }
-
-
-info : Ability -> Html msg
-info ability =
-    div []
-        [ div [] [ text ability.name ]
-        , div [] []
-        , div [] [ text ability.description ]
-        ]

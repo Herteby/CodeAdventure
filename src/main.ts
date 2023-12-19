@@ -1,13 +1,14 @@
+// @ts-ignore
 import {Elm} from "./Main.elm"
 import CodeMirror from "codemirror"
 import "codemirror/mode/elm/elm"
 import "codemirror/lib/codemirror.css"
 import "codemirror/theme/monokai.css"
-import "./style.css"
+import "./style.styl"
 import "@fontsource/fira-code"
 import "codemirror/addon/hint/show-hint"
 
-const app = Elm.Main.init({ node: document.getElementById("app") })
+Elm.Main.init({ node: document.getElementById("app") })
 const el = document.getElementById("codemirror") as HTMLElement
 const value = `module Main exposing (main)
 
@@ -77,7 +78,7 @@ const elmKeywords = [
 ]
 
 // Custom completion function
-function elmCodeCompletion(editor) {
+function elmCodeCompletion(editor: CodeMirror.Editor) {
 	const cursor = editor.getCursor() // Get the position of the cursor
 	const token = editor.getTokenAt(cursor) // Get the token at the cursor position
 	const start = token.start // Start position of the token
